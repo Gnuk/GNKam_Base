@@ -1,6 +1,6 @@
 {
 	"name" : "gnkam/base",
-	"type" : "project",
+	"type" : "library",
 	"keywords" : ["gnkam", "gnuk", "network", "kernel", "web", "kamsoft"],
 	"homepage" : "http://www.gnkw.org",
 	"license" : "AGPL-3.0",
