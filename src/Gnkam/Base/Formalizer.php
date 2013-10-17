@@ -44,6 +44,12 @@ abstract class Formalizer
 	* @var integer
 	*/
 	private $update;
+	
+	/**
+	* Max locktime
+	* @var integer;
+	*/
+	private $locktimeup;
 
 	/**
 	 * Formalizer constructor
@@ -58,6 +64,7 @@ abstract class Formalizer
 			$this->cachingOk = true;
 		}
 		$this->update = $update;
+		$this->locktimeup = $this->update/2;
 	}
 	
 	/**
@@ -173,7 +180,7 @@ abstract class Formalizer
 						# Old file exist : send old file
 						$json = json_decode(file_get_contents($filePath), true);
 						$json['status'] = 'old';
-						$json['updated'] = time() - $locktimeup;
+						$json['updated'] = time() - $this->locktimeup;
 						$string = json_encode($json);
 						file_put_contents($filePath, $string);
 					}
@@ -197,10 +204,9 @@ abstract class Formalizer
 	private function testPending($file)
 	{
 		$currentTime = time();
-		$locktimeup = $this->update/2;
 		if(is_file($file))
 		{
-			$lockTimeMax = file_get_contents($file) + $locktimeup;
+			$lockTimeMax = file_get_contents($file) + $this->locktimeup;
 			if($currentTime > $lockTimeMax)
 			{
 				unlink($file);
