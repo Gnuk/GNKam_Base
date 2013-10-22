@@ -218,4 +218,21 @@ abstract class Formalizer
 		}
 		return false;
 	}
+	
+	/**
+	* Get a service
+	* @param string $name Name of the resource directory
+	* @param string|integer $param Resource parameter
+	* @return array Json object in PHP array to serialize
+	*/
+	public function get($name, $param)
+	{
+		$fileDir = $this->cache . '/' . $name;
+		$filePath = $fileDir . '/' . $param . '.json';
+		if(!is_file($filePath))
+		{
+			return null;
+		}
+		return json_decode(file_get_contents($filePath), true);
+	}
 }
