@@ -223,9 +223,10 @@ abstract class Formalizer
 	* Get a service
 	* @param string $name Name of the resource directory
 	* @param string|integer $param Resource parameter
+	* @param boolean $meta If there is metainformations
 	* @return array Json object in PHP array to serialize
 	*/
-	public function get($name, $param)
+	public function get($name, $param, $meta = false)
 	{
 		$fileDir = $this->cache . '/' . $name;
 		$filePath = $fileDir . '/' . $param . '.json';
@@ -233,6 +234,11 @@ abstract class Formalizer
 		{
 			return null;
 		}
-		return json_decode(file_get_contents($filePath), true);
+		$object = json_decode(file_get_contents($filePath), true);
+		if($meta)
+		{
+			return $object;
+		}
+		return $object['data'];
 	}
 }
