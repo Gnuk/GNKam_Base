@@ -63,6 +63,15 @@ abstract class Formalizer
 			$this->cache = rtrim($cache, '/');
 			$this->cachingOk = true;
 		}
+		$this->setUpdate($update);
+	}
+	
+	/**
+	* Change update time
+	* @param integer $update Update time in seconds
+	*/
+	public function setUpdate($update)
+	{
 		$this->update = $update;
 		$this->locktimeup = $this->update/2;
 	}
