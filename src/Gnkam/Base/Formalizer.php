@@ -241,4 +241,13 @@ abstract class Formalizer
 		}
 		return $object['data'];
 	}
+	
+	/**
+	* Get cache link
+	* @return string Cache link
+	*/
+	public function getCacheLink()
+	{
+		return $this->cache;
+	}
 }
