@@ -225,9 +225,10 @@ abstract class Formalizer
 							);
 						}
 					}
-					# Remove lock file
-					unlink($filePathPending);
+					
 				}
+				# Remove lock file
+				unlink($filePathPending);
 			}
 		}
 		return $json;
