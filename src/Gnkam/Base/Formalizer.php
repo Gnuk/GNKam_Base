@@ -163,44 +163,71 @@ abstract class Formalizer
 				# Create lock file
 				file_put_contents($filePathPending, time());
 				
-				# Receive the group json data
-				$json['data'] = call_user_func_array(array(
+				$receivedData = call_user_func_array(array(
 					$this, $functionName
 				), $functionParams);
-				
-				# Set meta group informations
-				$json['status'] = 'last';
-				$json['updated'] = time();
-				$json['date'] = time();
-				
-				# Put it in a string
-				$string = json_encode($json);
-				
-				# Test data
-				if(!empty($string) AND count($json['data']) > 0)
+				# Test return
+				if($receivedData === null)
 				{
-					file_put_contents($filePath, $string);
+					$json = array(
+						'type' => 'error',
+						'message' => 'Resource get failure',
+						'code' => 500
+					);
+				}
+				else if($receivedData instanceof ReceiverError)
+				{
+					$json = array(
+						'type' => 'error',
+						'message' => $receivedData->getMessage(),
+						'code' => $receivedData->getCode()
+					);
 				}
 				else
 				{
-					# Error case (example : impossible to contact ADE)
-					if(is_file($filePath))
+					# Receive the group json data
+					$json['data'] = $receivedData;
+					
+					# Set meta group informations
+					$json['status'] = 'last';
+					$json['updated'] = time();
+					$json['date'] = time();
+					
+					# Put it in a string
+					$string = json_encode($json);
+					
+					
+					
+					# Test data
+					if(!empty($string))
 					{
-						# Old file exist : send old file
-						$json = json_decode(file_get_contents($filePath), true);
-						$json['status'] = 'old';
-						$json['updated'] = time() - $this->locktimeup;
-						$string = json_encode($json);
 						file_put_contents($filePath, $string);
 					}
 					else
 					{
-						# Send error
-						$json = array('error' => 'resource get failure');
+						# Error case (example : impossible to contact ADE)
+						if(is_file($filePath))
+						{
+							# Old file exist : send old file
+							$json = json_decode(file_get_contents($filePath), true);
+							$json['status'] = 'old';
+							$json['updated'] = time() - $this->locktimeup;
+							$string = json_encode($json);
+							file_put_contents($filePath, $string);
+						}
+						else
+						{
+							# Send error
+							$json = array(
+								'type' => 'error',
+								'message' => 'Resource get failure',
+								'code' => 500
+							);
+						}
 					}
+					# Remove lock file
+					unlink($filePathPending);
 				}
-				# Remove lock file
-				unlink($filePathPending);
 			}
 		}
 		return $json;
