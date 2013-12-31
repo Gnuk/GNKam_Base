@@ -97,7 +97,11 @@ abstract class Formalizer
 		# Check for cache
 		if(!$this->cachingOk)
 		{
-			return null;
+			return array(
+				'type' => 'error',
+				'message' => 'Cache directory problem',
+				'code' => 500
+			);
 		}
 		
 		# Create cache group directory if not exists
@@ -106,7 +110,11 @@ abstract class Formalizer
 		{
 			if(!mkdir($fileDir))
 			{
-				return null;
+				return array(
+					'type' => 'error',
+					'message' => 'Impossible to create cache',
+					'code' => 500
+				);
 			}
 		}
 		
@@ -115,7 +123,7 @@ abstract class Formalizer
 		$filePathPending = $filePath . '.lock';
 		
 		# Initialisation
-		$json = array();
+		$json = array('type' => 'success');
 		$recreate = false;
 		
 		# Test pending
