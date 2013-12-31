@@ -123,7 +123,7 @@ abstract class Formalizer
 		$filePathPending = $filePath . '.lock';
 		
 		# Initialisation
-		$json = array('type' => 'success');
+		$json = array();
 		$recreate = false;
 		
 		# Test pending
