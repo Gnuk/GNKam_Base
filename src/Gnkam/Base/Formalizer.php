@@ -177,18 +177,22 @@ abstract class Formalizer
 				# Test return
 				if($receivedData === null)
 				{
-					$json = array(
-						'type' => 'error',
-						'message' => 'Resource get failure',
-						'code' => 500
+					$json = $this->treatAsError($filePath,
+						array(
+							'type' => 'error',
+							'message' => 'Resource get failure',
+							'code' => 500
+						)
 					);
 				}
 				else if($receivedData instanceof ReceiverError)
 				{
-					$json = array(
-						'type' => 'error',
-						'message' => $receivedData->getMessage(),
-						'code' => $receivedData->getCode()
+					$json = $this->treatAsError($filePath,
+						array(
+							'type' => 'error',
+							'message' => $receivedData->getMessage(),
+							'code' => $receivedData->getCode()
+						)
 					);
 				}
 				else
@@ -213,31 +217,39 @@ abstract class Formalizer
 					}
 					else
 					{
-						# Error case (example : impossible to contact ADE)
-						if(is_file($filePath))
-						{
-							# Old file exist : send old file
-							$json = json_decode(file_get_contents($filePath), true);
-							$json['status'] = 'old';
-							$json['updated'] = time() - $this->locktimeup;
-							$string = json_encode($json);
-							file_put_contents($filePath, $string);
-						}
-						else
-						{
-							# Send error
-							$json = array(
+						$json = $this->treatAsError($filePath,
+							array(
 								'type' => 'error',
 								'message' => 'Resource get failure',
 								'code' => 500
-							);
-						}
+							)
+						);
 					}
 					
 				}
 				# Remove lock file
 				unlink($filePathPending);
 			}
+		}
+		return $json;
+	}
+	
+	private function treatAsError($filePath, $error)
+	{
+		# Error case (example : impossible to contact ADE)
+		if(is_file($filePath))
+		{
+			# Old file exist : send old file
+			$json = json_decode(file_get_contents($filePath), true);
+			$json['status'] = 'old';
+			$json['updated'] = time() - $this->locktimeup;
+			$string = json_encode($json);
+			file_put_contents($filePath, $string);
+		}
+		else
+		{
+			# Send error
+			$json = $error;
 		}
 		return $json;
 	}
